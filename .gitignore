@@ -35,3 +35,7 @@ out/
 
 ### VS Code ###
 .vscode/
+<<<<<<< HEAD
+=======
+gradle/wrapper/*.zip
+>>>>>>> recovery-branch
