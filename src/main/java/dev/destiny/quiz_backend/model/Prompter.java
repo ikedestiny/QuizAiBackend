@@ -25,6 +25,7 @@ public class Prompter {
             5. Ensure options are plausible distractors.
             6. Escape special JSON characters.
             7. Do not include any explanations or notes—only pure JSON.
+            8. Make sure the response is correct valid json. No extra stuff or introductory text. I am parsing it using a java parser that needs json in the format i gave above
             """, type, level, numberOfQuestions, level, type);
     }
 }

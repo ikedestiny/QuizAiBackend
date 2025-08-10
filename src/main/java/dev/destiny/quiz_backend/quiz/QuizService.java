@@ -3,6 +3,7 @@ package dev.destiny.quiz_backend.quiz;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.destiny.quiz_backend.ai.DeepSeekService;
+import dev.destiny.quiz_backend.ai.MistralAIService;
 import dev.destiny.quiz_backend.dto.QuizDto;
 import dev.destiny.quiz_backend.model.Prompter;
 import dev.destiny.quiz_backend.model.Quiz;
@@ -12,15 +13,17 @@ import reactor.core.publisher.Mono;
 @Service
 public class QuizService {
     private final DeepSeekService deepSeekService;
+    private final MistralAIService mistralAIService;
 
 
-    public QuizService(DeepSeekService deepSeekService) {
+    public QuizService(DeepSeekService deepSeekService, MistralAIService mistralAIService) {
         this.deepSeekService = deepSeekService;
+        this.mistralAIService = mistralAIService;
     }
 
     public Mono<Quiz> generateQuiz(QuizDto quiz){
         String prompt = Prompter.quizPrompt(quiz.type(),quiz.level(),quiz.numberOfQuestions());
-        return deepSeekService.generateQuiz(prompt)
+        return mistralAIService.generateQuiz(prompt)
                 .flatMap(this::validateAndParseQuiz);
     }
 
@@ -30,6 +33,7 @@ public class QuizService {
             Quiz quiz = mapper.readValue(jsonResponse, Quiz.class);
             return Mono.just(quiz);
         } catch (JsonProcessingException e) {
+            System.out.println(jsonResponse);
             return Mono.error(new RuntimeException("Invalid JSON from AI"));
         }
     }

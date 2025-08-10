@@ -3,14 +3,20 @@ FROM eclipse-temurin:17-jdk AS builder
 
 WORKDIR /app
 
-# Copy Gradle wrapper + pre-downloaded Gradle ZIP
+# 1. First copy only the files needed for dependency resolution
 COPY gradlew .
-COPY gradle gradle
+COPY gradle/wrapper/gradle-wrapper.properties gradle/wrapper/
+COPY gradle/wrapper/gradle-wrapper.jar gradle/wrapper/
 COPY build.gradle .
 COPY settings.gradle .
 
-# Now build (no download needed)
+# 2. Download dependencies (this layer will be cached unless build.gradle changes)
+RUN ./gradlew dependencies --no-daemon
+
+# 3. Now copy the rest of the source code
 COPY src src
+
+# 4. Build the application
 RUN ./gradlew build --no-daemon -x test
 
 # Stage 2: Runtime
